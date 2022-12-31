@@ -99,7 +99,7 @@ if __name__ == '__main__':
     electrical_phase = []
 
     # electrical angle is the direct axis angle
-    throttle = 0 # simulate a start from zero throttle ramp
+    throttle = 100 # simulate a start from zero throttle ramp
     for electrical_angle in range(1080):
         electrical_phase += [electrical_angle]
 
