@@ -22,8 +22,8 @@ if __name__ == '__main__':
     for angle in range(360):
         # always 0% field weakening
         a = (angle + 90) % 360
-        b = (angle + 90 + 120) % 360
-        c = (angle + 90 + 240) % 360
+        b = (angle + 90 + 240) % 360
+        c = (angle + 90 + 120) % 360
 
         spwm_phases += [[spwm_lut[a], spwm_lut[b], spwm_lut[c]]]
         svpwm_phases += [[svpwm_lut[a], svpwm_lut[b], svpwm_lut[c]]]
@@ -40,27 +40,16 @@ if __name__ == '__main__':
     comm_type_enum = csnake.Enum('commutation_type_enum', typedef=True)
     comm_type_enum.add_values( ['spwm_e', 'svpwm_e'] )
 
-    # 
-    direct_axis_angle_var = csnake.Variable('direct_axis_angle', 'uint16_t')
+    # variables
     throttle_var = csnake.Variable('throttle_perc', 'uint8_t')
     field_weakening_var = csnake.Variable('field_weakening_perc', 'uint8_t')
     commutation_type_var = csnake.Variable('commutation_type', comm_type_enum.name)
-    comm_type_spwm_var = csnake.Variable(comm_type_enum.values[0].name, comm_type_enum.name, value=comm_type_enum.values[0].value)
-    comm_type_svpwm_var = csnake.Variable(comm_type_enum.values[1].name, comm_type_enum.name, value=comm_type_enum.values[1].value)
 
+    # create function
     pwm_lookup_func = csnake.Function('GetPWMDutyCycles', return_type=duty_cycle_struct.name)
     pwm_lookup_func.add_argument( throttle_var )
     pwm_lookup_func.add_argument( field_weakening_var )
     pwm_lookup_func.add_argument( commutation_type_var )
-
-    pwm_func_code = csnake.CodeWriter()
-    pwm_func_code.start_switch(commutation_type_var)
-    pwm_func_code.add_switch_case(comm_type_spwm_var)
-    quadrature_axis = '(uint16_t)' + direct_axis_angle_var.name + ' + (90*(100-(uint16_t)' + field_weakening_var.name + ')'
-    a_duty_cmd = throttle_var.name + ' * ' + spwm_lut_var.name + '[ (' + quadrature_axis + ')/100) % 360 ]'
-    pwm_func_code.add_line(a_duty_cmd)
-
-    pwm_lookup_func.add_code( pwm_func_code )
 
     # generate header file
     cw = csnake.CodeWriter()
@@ -69,31 +58,32 @@ if __name__ == '__main__':
     cw.start_if_def('COMM_LOOK_UP_TABLE_H', invert=True)
     cw.add_define('COMM_LOOK_UP_TABLE_H')
     cw.add_line()
+    cw.add_line(comment='TYPE DEFINITIONS')
+    cw.add_enum(comm_type_enum)
+    cw.add_line()
     cw.add_struct(duty_cycle_struct)
     cw.add_line()
-    cw.start_comment()
-    cw.add_line('Lookup table used for Sinusoidal PWM commutation')
-    cw.end_comment()
+    cw.add_line(comment='GLOBAL VARIABLES')
+    cw.add_line(comment='Lookup table used for Sinusoidal PWM commutation')
     cw.add_variable_initialization(spwm_lut_var)
     cw.add_line()
-    cw.start_comment()
-    cw.add_line('Lookup table used for Space Vector PWM commutation: https://youtu.be/5eQyoVMz1dY')
-    cw.end_comment()
+    cw.add_line(comment='Lookup table used for Space Vector PWM commutation: https://youtu.be/5eQyoVMz1dY')
     cw.add_variable_initialization(svpwm_lut_var)
     cw.add_line()
+    cw.add_line(comment='FUNCTION PROTOTYPES')
     cw.add_function_prototype(pwm_lookup_func)
     cw.add_line()
     cw.end_if_def()
     cw.write_to_file('../CommutationLookupTable.h')
 
     # generate c file with functions for using the lookup tables
-    cw = csnake.CodeWriter()
-    cw.add_autogen_comment(os.path.basename(__file__))
-    cw.add_line()
-    cw.include('CommutationLookupTable.h')
-    cw.add_line()
-    cw.add_function_definition(pwm_lookup_func)
-    cw.write_to_file('../CommutationLookupTable.c')
+    #cw = csnake.CodeWriter()
+    #cw.add_autogen_comment(os.path.basename(__file__))
+    #cw.add_line()
+    #cw.include('CommutationLookupTable.h')
+    #cw.add_line()
+    #cw.add_function_definition(pwm_lookup_func)
+    #cw.write_to_file('../CommutationLookupTable.c')
 
     # plot the results
     fig, axs = plt.subplots(3)
