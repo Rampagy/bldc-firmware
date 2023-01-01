@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     # variables
     direct_axis_var = csnake.Variable('direct_axis_angle', 'uint16_t')
-    throttle_var = csnake.Variable('throttle_perc', 'uint8_t')
+    throttle_var = csnake.Variable('throttle_perc', 'int8_t')
     field_weakening_var = csnake.Variable('field_weakening_perc', 'uint8_t')
     commutation_type_var = csnake.Variable('commutation_type', comm_type_enum.name)
 
@@ -69,11 +69,6 @@ if __name__ == '__main__':
     cw.add_struct(duty_cycle_struct)
     cw.add_line()
     cw.add_line(comment='GLOBAL VARIABLES')
-    cw.add_line(comment='Lookup table used for Sinusoidal PWM commutation')
-    cw.add_variable_initialization(spwm_lut_var)
-    cw.add_line()
-    cw.add_line(comment='Lookup table used for Space Vector PWM commutation: https://youtu.be/5eQyoVMz1dY')
-    cw.add_variable_initialization(svpwm_lut_var)
     cw.add_line()
     cw.add_line(comment='FUNCTION PROTOTYPES')
     cw.add_function_prototype(pwm_lookup_func)
@@ -81,14 +76,17 @@ if __name__ == '__main__':
     cw.end_if_def()
     cw.write_to_file('../include/CommutationLookupTable.h')
 
-    # generate c file with functions for using the lookup tables
-    #cw = csnake.CodeWriter()
-    #cw.add_autogen_comment(os.path.basename(__file__))
-    #cw.add_line()
-    #cw.include('CommutationLookupTable.h')
-    #cw.add_line()
-    #cw.add_function_definition(pwm_lookup_func)
-    #cw.write_to_file('../CommutationLookupTable.c')
+    # generate ch file for the lookup tables
+    cw = csnake.CodeWriter()
+    cw.add_autogen_comment(os.path.basename(__file__))
+    cw.add_line()
+    cw.add_line(comment='Lookup table used for Sinusoidal PWM commutation')
+    cw.add_variable_initialization(spwm_lut_var)
+    cw.add_line()
+    cw.add_line(comment='Lookup table used for Space Vector PWM commutation: https://youtu.be/5eQyoVMz1dY')
+    cw.add_variable_initialization(svpwm_lut_var)
+    cw.add_line()
+    cw.write_to_file('../include/CommutationLookupTable.ch')
 
     # plot the results
     fig, axs = plt.subplots(3)
