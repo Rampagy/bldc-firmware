@@ -41,12 +41,14 @@ if __name__ == '__main__':
     comm_type_enum.add_values( ['spwm_e', 'svpwm_e'] )
 
     # variables
+    direct_axis_var = csnake.Variable('direct_axis_angle', 'uint16_t')
     throttle_var = csnake.Variable('throttle_perc', 'uint8_t')
     field_weakening_var = csnake.Variable('field_weakening_perc', 'uint8_t')
     commutation_type_var = csnake.Variable('commutation_type', comm_type_enum.name)
 
     # create function
     pwm_lookup_func = csnake.Function('GetPWMDutyCycles', return_type=duty_cycle_struct.name)
+    pwm_lookup_func.add_argument( direct_axis_var )
     pwm_lookup_func.add_argument( throttle_var )
     pwm_lookup_func.add_argument( field_weakening_var )
     pwm_lookup_func.add_argument( commutation_type_var )
@@ -57,6 +59,9 @@ if __name__ == '__main__':
     cw.add_line()
     cw.start_if_def('COMM_LOOK_UP_TABLE_H', invert=True)
     cw.add_define('COMM_LOOK_UP_TABLE_H')
+    cw.add_line()
+    cw.add_line(comment='INCLUDES')
+    cw.include("<stdint.h>")
     cw.add_line()
     cw.add_line(comment='TYPE DEFINITIONS')
     cw.add_enum(comm_type_enum)
@@ -74,7 +79,7 @@ if __name__ == '__main__':
     cw.add_function_prototype(pwm_lookup_func)
     cw.add_line()
     cw.end_if_def()
-    cw.write_to_file('../CommutationLookupTable.h')
+    cw.write_to_file('../include/CommutationLookupTable.h')
 
     # generate c file with functions for using the lookup tables
     #cw = csnake.CodeWriter()

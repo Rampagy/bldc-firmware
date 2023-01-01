@@ -1,12 +1,12 @@
 #include "CommutationLookupTable.h"
 
 
-Duty_Cycle_Struct GetPWMDutyCycles(uint8_t throttle_perc, uint8_t field_weakening_perc, commutation_type_enum commutation_type)
+Duty_Cycle_Struct GetPWMDutyCycles(uint16_t direct_axis_angle, uint8_t throttle_perc, uint8_t field_weakening_perc, commutation_type_enum commutation_type)
 {
 	int16_t field_weakening_angle;
-    uint16_t lookup_angle_a; // = (0 + field_weakening_angle) % 360;
-    uint16_t lookup_angle_b; // = (240 + field_weakening_angle) % 360;
-    uint16_t lookup_angle_c; // = (120 + field_weakening_angle) % 360;
+    uint16_t lookup_angle_a;
+    uint16_t lookup_angle_b;
+    uint16_t lookup_angle_c;
 	int8_t sign;
 	
     Duty_Cycle_Struct duty_cycles = {
