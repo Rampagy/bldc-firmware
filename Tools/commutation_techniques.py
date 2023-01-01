@@ -2,7 +2,7 @@ import math
 
 
 def degToRad(angDeg):
-    return angDeg * math.pi / 180
+    return math.radians(angDeg)
 
 def sineLookup(angle):
     return 0.5*math.sin(degToRad(angle))+0.5
@@ -35,12 +35,13 @@ def spwm(direct_axis, throttle, field_weakening):
     # field weakening (0 to 100) is the percent of field weaking you desire
     # returns tuple of each phases high side mosfet duty cycle (phase a duty, phase b duty, phase c duty)
     # sinsoidal pwm
-    
+
     # control to 90 degrees ahead of the direct axis
     # to go in reverse swap +90 with -90
     # to field weaken change +/-90 to something closer to 0
-    quadrature_axis = direct_axis + 90*(100-field_weakening)/100
-    return (  throttle*sineLookup(quadrature_axis), throttle*sineLookup(quadrature_axis+240), throttle*sineLookup(quadrature_axis+120) )
+    sign = -1 if throttle < 0 else 1
+    quadrature_axis = direct_axis + sign*90*(100-field_weakening)/100
+    return (  abs(throttle)*sineLookup(quadrature_axis), abs(throttle)*sineLookup(quadrature_axis+240), abs(throttle)*sineLookup(quadrature_axis+120) )
 
 def svpwm(direct_axis, throttle, field_weakening):
     # throttle (-100 to 100) is the max duty cycle that will be commanded
@@ -48,14 +49,14 @@ def svpwm(direct_axis, throttle, field_weakening):
     # returns tuple of each phase's duty cycle (phase a duty, phase b duty, phase c duty)
     # Alternating Reverse Space Vector Modulation
     
-    pwm_period = throttle # 100 #0.00002 # in seconds # this is supposed to be in seconds, but by putting 100 seconds it outputs duty cycle in percent
+    pwm_period = abs(throttle) # 100 #0.00002 # in seconds # this is supposed to be in seconds, but by putting 100 seconds it outputs duty cycle in percent
     duty_cycle = 1 # in percent
-
+    sign = -1 if throttle < 0 else 1
 
     # control to 90 degrees ahead of the direct axis
     # to go in reverse swap +90 with -90
     # to field weaken change +/-90 to something closer to 0
-    quadrature_axis = direct_axis + 90*(100-field_weakening)/100
+    quadrature_axis = direct_axis + sign*90*(100-field_weakening)/100
 
     # this -30 is bugging me, but idk how to get rid of it
     alpha = (quadrature_axis-30) % 60
@@ -100,15 +101,19 @@ if __name__ == '__main__':
 
     # electrical angle is the direct axis angle
     throttle = 100 # simulate a start from zero throttle ramp
+    field_weakening = 0 # simulate changing field weakening
     for electrical_angle in range(1080):
         electrical_phase += [electrical_angle]
 
         trap_dutys += [trapezoidal(electrical_angle)]
-        spwm_dutys += [spwm(electrical_angle, throttle, 0)]
-        svpwm_dutys += [svpwm(electrical_angle, throttle, 0)]
+        spwm_dutys += [spwm(electrical_angle, throttle, field_weakening)]
+        svpwm_dutys += [svpwm(electrical_angle, throttle, field_weakening)]
 
         if throttle < 100:
             throttle += 0.15
+
+        if field_weakening > 0:
+            field_weakening -= 1
 
 
     spwm_a = []

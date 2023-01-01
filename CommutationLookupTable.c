@@ -17,7 +17,7 @@ Duty_Cycle_Struct GetPWMDutyCycles(uint16_t direct_axis_angle, int8_t throttle_p
     };
     
     /* bounds checks and sign determination */
-    field_weakening_perc = (field_weakening_perc >= 100) ? 0 : field_weakening_perc;
+    field_weakening_perc = (field_weakening_perc > 100) ? 0 : field_weakening_perc;
     sign = (throttle_perc >= 0) ? 1 : -1;
     
     field_weakening_angle = (int16_t)direct_axis_angle + (int16_t)sign*((90*(100-(uint16_t)field_weakening_perc))/100);

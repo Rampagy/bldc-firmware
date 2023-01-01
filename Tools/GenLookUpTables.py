@@ -109,4 +109,4 @@ if __name__ == '__main__':
     axs[2].set_xlabel('Direct Axis Angle, deg')
     axs[2].set_ylabel('High Side Transistor Duty Cycle, percent')
 
-    #plt.show()
+    plt.show()
