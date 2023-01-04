@@ -1,6 +1,5 @@
 #include "CommutationLookupTable.h"
 #include "CommutationLookupTable.ch"
-#include <stdio.h>
 
 Duty_Cycle_Struct GetPWMDutyCycles(uint16_t direct_axis_angle, int8_t throttle_perc, uint8_t field_weakening_perc, commutation_type_enum commutation_type)
 {
@@ -15,7 +14,7 @@ Duty_Cycle_Struct GetPWMDutyCycles(uint16_t direct_axis_angle, int8_t throttle_p
         .b = 0,
         .c = 0
     };
-    
+
     /* bounds checks and sign determination */
     field_weakening_perc = (field_weakening_perc > 100) ? 0 : field_weakening_perc;
     sign = (throttle_perc >= 0) ? 1 : -1;
@@ -26,7 +25,7 @@ Duty_Cycle_Struct GetPWMDutyCycles(uint16_t direct_axis_angle, int8_t throttle_p
     lookup_angle_a = (0 + field_weakening_angle + 360) % 360;
     lookup_angle_b = (240 + field_weakening_angle + 360) % 360;
     lookup_angle_c = (120 + field_weakening_angle + 360) % 360;
-    
+
     /* Determine commutation type */
     switch (commutation_type)
     {
@@ -45,6 +44,7 @@ Duty_Cycle_Struct GetPWMDutyCycles(uint16_t direct_axis_angle, int8_t throttle_p
             duty_cycles.c = SVPWM_LUT[lookup_angle_c];
             break;
     } /* ~switch (commutation_type) */
+
 
     /* Use absolute value of throttle cmd for scaling */
     throttle_perc = (throttle_perc>=0) ? throttle_perc : throttle_perc*-1;

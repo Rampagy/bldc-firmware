@@ -2,58 +2,92 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "unity/unity.h"
 #include "../include/CommutationLookupTable.h"
 
+// constructor and deconstructor for unity test suite
+void setUp (void) {} /* Is run before every test, put unit init calls here. */
+void tearDown (void) {} /* Is run after every test, put unit clean-up calls here. */
 
 
-
-int main (int argc, char* args[])
+void test_spwm_commutation(void)
 {
     Duty_Cycle_Struct phase_dutys;
     char line[1024];
     int line_num = 1;
-    int fail_count = 0;
+    int tolerance = 1;
 
     // read test solutions
     FILE* stream = fopen("solutions/spwm.csv", "r");
     while (fgets(line, 1024, stream))
     {
+        // these must be int otherwise they are not read in properly during sscanf
         int angle, throttle, field_weakening, a, b, c = 0;
         int items_read = sscanf(line, "%d,%d,%d,%d,%d,%d\n", &angle, &throttle, &field_weakening, &a, &b, &c);
+
+
         if (items_read == 6)
         {
             phase_dutys = GetPWMDutyCycles((uint16_t)angle, (int8_t)throttle, (uint8_t)field_weakening, spwm_e);
 
-            // Some minor rounding errors due to float vs integer math.  Allow up to 3 degrees of rounding errors across all phases
-            if ((abs(phase_dutys.a - a) + abs(phase_dutys.b - b) + abs(phase_dutys.c - c)) > 3)
-            {
-                printf("spwm line %d test case failed, phases=(%d, %d, %d)\n", line_num, phase_dutys.a, phase_dutys.b, phase_dutys.c);
-                fail_count++;
-            }
-            line_num++;
+            char a_error_msg[64];
+            char b_error_msg[64];
+            char c_error_msg[64];
+
+            sprintf(a_error_msg, "(line %d, Phase A)", line_num);
+            sprintf(b_error_msg, "(line %d, Phase B)", line_num);
+            sprintf(c_error_msg, "(line %d, Phase C)", line_num);
+
+            // Some minor rounding errors due to float vs integer math.  Allow up to 1 degrees of tolerance per phase
+            TEST_ASSERT_UINT8_WITHIN_MESSAGE(1, a, phase_dutys.a, a_error_msg);
+            TEST_ASSERT_UINT8_WITHIN_MESSAGE(1, b, phase_dutys.b, b_error_msg);
+            TEST_ASSERT_UINT8_WITHIN_MESSAGE(1, c, phase_dutys.c, c_error_msg);
         }
+        line_num++;
     }
+}
+
+void test_svpwm_commutation(void)
+{
+    Duty_Cycle_Struct phase_dutys;
+    char line[1024];
+    int line_num = 1;
+    int tolerance = 1;
 
     // read test solutions
-    line_num = 1;
-    stream = fopen("solutions/svpwm.csv", "r");
+    FILE* stream = fopen("solutions/svpwm.csv", "r");
     while (fgets(line, 1024, stream))
     {
+        // these must be int otherwise they are not read in properly during sscanf
         int angle, throttle, field_weakening, a, b, c = 0;
         int items_read = sscanf(line, "%d,%d,%d,%d,%d,%d\n", &angle, &throttle, &field_weakening, &a, &b, &c);
+
         if (items_read == 6)
         {
             phase_dutys = GetPWMDutyCycles((uint16_t)angle, (int8_t)throttle, (uint8_t)field_weakening, svpwm_e);
 
-            // Some minor rounding errors due to float vs integer math.  Allow up to 3 degrees of rounding errors across all phases
-            if ((abs(phase_dutys.a - a) + abs(phase_dutys.b - b) + abs(phase_dutys.c - c)) > 3)
-            {
-                printf("svpwm line %d test case failed, phases=(%d, %d, %d)\n", line_num, phase_dutys.a, phase_dutys.b, phase_dutys.c);
-                fail_count++;
-            }
-            line_num++;
-        }
-    }
+            char a_error_msg[64];
+            char b_error_msg[64];
+            char c_error_msg[64];
 
-    return fail_count;
+            sprintf(a_error_msg, "(line %d, Phase A)", line_num);
+            sprintf(b_error_msg, "(line %d, Phase B)", line_num);
+            sprintf(c_error_msg, "(line %d, Phase C)", line_num);
+
+            // Some minor rounding errors due to float vs integer math.  Allow up to 1 degrees of tolerance per phase
+            TEST_ASSERT_UINT8_WITHIN_MESSAGE(1, a, phase_dutys.a, a_error_msg);
+            TEST_ASSERT_UINT8_WITHIN_MESSAGE(1, b, phase_dutys.b, b_error_msg);
+            TEST_ASSERT_UINT8_WITHIN_MESSAGE(1, c, phase_dutys.c, c_error_msg);
+        }
+        line_num++;
+    }
+}
+
+int main (int argc, char* args[])
+{
+    UNITY_BEGIN();
+    RUN_TEST(test_spwm_commutation);
+    RUN_TEST(test_svpwm_commutation);
+    return UNITY_END();
 }

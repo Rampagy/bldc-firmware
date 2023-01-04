@@ -11,10 +11,9 @@ def gen_svpwm_3_phases(angle, throttle, field_weakening):
 
 
 if __name__ == '__main__':
-
     spwm_phases = []
     svpwm_phases = []
-    for throttle in [-100, -50, 0, 50, 100]:
+    for throttle in [100, 50, 0, -50, -100]:
         for field_weakening in [0, 50, 100]:
             for angle in range(360):
                 spwm_phases += [gen_spwm_3_phases(angle, throttle, field_weakening)]
