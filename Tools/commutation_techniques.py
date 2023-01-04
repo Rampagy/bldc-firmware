@@ -1,11 +1,12 @@
 import math
+import sys
 
 
 def degToRad(angDeg):
     return math.radians(angDeg)
 
 def sineLookup(angle):
-    return 0.5*math.sin(degToRad(angle))+0.5
+    return 0.5*math.cos(degToRad(angle))+0.5
 
 def trapezoidal(direct_axis):
     # returns tuple of each FET duty cycle (Q1 duty, Q2 duty, Q3 duty, Q4 duty, Q5 duty, Q6 duty)
@@ -59,36 +60,36 @@ def svpwm(direct_axis, throttle, field_weakening):
     quadrature_axis = direct_axis + sign*90*(100-field_weakening)/100
 
     # this -30 is bugging me, but idk how to get rid of it
-    alpha = (quadrature_axis-30) % 60
+    alpha = quadrature_axis % 60
     T1 = pwm_period * duty_cycle * math.sin( degToRad(60-alpha) )
     T2 = pwm_period * duty_cycle * math.sin( degToRad(alpha) )
     T0 = pwm_period - T1 - T2
 
-    w = 0.5*T0 + T2
-    x = 0.5*T0
-    y = 0.5*T0 + T1
-    z = 0.5*T0 + T1 + T2
+    #w = 0.5*T0 + T2
+    #x = 0.5*T0
+    #y = 0.5*T0 + T1
+    #z = 0.5*T0 + T1 + T2
 
     # this -30 is bugging me, but idk how to get rid of it
-    sector = ((quadrature_axis-30) // 60) % 6
-    if sector == 4: # 0b101
+    sector = (quadrature_axis // 60) % 6
+    if sector == 0: # sector 1
         # 0 to 60 degrees
-        return ( x, y, z )
-    elif sector == 5: # 0b100
+        return ( T1+T2+0.5*T0, T2+0.5*T0, 0.5*T0 )
+    elif sector == 1: # sector 2
         # 60 to 120 degrees
-        return ( w, x, z )
-    elif sector == 0: # 0b110
+        return ( T1 + 0.5*T0, T1+T2+0.5*T0, 0.5*T0 )
+    elif sector == 2: # sector 3
         # 120 to 180 degrees
-        return ( z, x, y )
-    elif sector == 1: # 0b010
+        return ( 0.5*T0, T1+T2+0.5*T0, T2+0.5*T0 )
+    elif sector == 3: # sector 4
         # 180 to 240 degrees
-        return ( z, w, x )
-    elif sector == 2: # 0b011
+        return ( 0.5*T0, T1+0.5*T0,  T1+T2+0.5*T0 )
+    elif sector == 4: # sector 5
         # 240 to 300 degrees
-        return ( y, z, x )
-    elif sector == 3: # 0b001
+        return ( T2+0.5*T0, 0.5*T0,  T1+T2+0.5*T0 )
+    elif sector == 5: # sector 6
         # 300 to 360 degrees
-        return ( x, z, w )
+        return ( T1+T2+0.5*T0, 0.5*T0, T1+0.5*T0 )
 
 
 if __name__ == '__main__':
