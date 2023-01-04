@@ -22,11 +22,11 @@ void test_spwm_commutation(void)
     FILE* stream = fopen("solutions/spwm.csv", "r");
     while (fgets(line, 1024, stream))
     {
-        // these must be int otherwise they are not read in properly during sscanf
+        // these must be int otherwise they are not read in properly during sscanf()
         int angle, throttle, field_weakening, a, b, c = 0;
         int items_read = sscanf(line, "%d,%d,%d,%d,%d,%d\n", &angle, &throttle, &field_weakening, &a, &b, &c);
 
-
+        // if 6 items were not read it is not a valid test case
         if (items_read == 6)
         {
             phase_dutys = GetPWMDutyCycles((uint16_t)angle, (int8_t)throttle, (uint8_t)field_weakening, spwm_e);
@@ -59,10 +59,11 @@ void test_svpwm_commutation(void)
     FILE* stream = fopen("solutions/svpwm.csv", "r");
     while (fgets(line, 1024, stream))
     {
-        // these must be int otherwise they are not read in properly during sscanf
+        // these must be int otherwise they are not read in properly during sscanf()
         int angle, throttle, field_weakening, a, b, c = 0;
         int items_read = sscanf(line, "%d,%d,%d,%d,%d,%d\n", &angle, &throttle, &field_weakening, &a, &b, &c);
 
+        // if 6 items were not read it is not a valid test case
         if (items_read == 6)
         {
             phase_dutys = GetPWMDutyCycles((uint16_t)angle, (int8_t)throttle, (uint8_t)field_weakening, svpwm_e);

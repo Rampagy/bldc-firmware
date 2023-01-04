@@ -143,14 +143,14 @@ if __name__ == '__main__':
                 electrical_phase, svpwm_a, 'g--', electrical_phase, svpwm_b, 'b--', electrical_phase, svpwm_c, 'r--',)
     axs[0].legend(['SPWM Phase A', 'SPWM Phase B', 'SPWM Phase C',
                     'SVPWM Phase A', 'SVPWM Phase B', 'SVPWM Phase C'])
-    axs[0].set_ylabel('High Side Transistor Duty Cycle, percent')
-    axs[0].set_xlabel('Direct Axis Angle, deg')
-    axs[0].set_title('Sinusoidal PWM')
+    axs[0].set_ylabel('High side transistor duty cycle (percent)')
+    axs[0].set_xlabel('Direct axis angle (deg)')
+    axs[0].set_title('Duty cycle for different commutation techniques')
 
     axs[1].plot(electrical_phase, spwm_dV, electrical_phase, svpwm_dV)
     axs[1].legend(['SPWM', 'SVPWM'])
-    axs[1].set_ylabel('Line to Line Voltage (percent of VBatt)')
-    axs[1].set_xlabel('Direct Axis Angle, deg')
-    axs[1].set_title('Line to Line Voltage between different commutation techniques')
+    axs[1].set_ylabel('Phase to phase voltage (percent of battery voltage)')
+    axs[1].set_xlabel('Direct axis angle (deg)')
+    axs[1].set_title('Phase voltage for different commutation techniques')
 
     plt.show()
