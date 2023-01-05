@@ -44,11 +44,11 @@ def spwm(direct_axis, throttle, field_weakening):
     quadrature_axis = direct_axis + sign*90*(100-field_weakening)/100
     return (  abs(throttle)*sineLookup(quadrature_axis), abs(throttle)*sineLookup(quadrature_axis+240), abs(throttle)*sineLookup(quadrature_axis+120) )
 
-def svpwm(direct_axis, throttle, field_weakening):
+def ars_svpwm(direct_axis, throttle, field_weakening):
     # throttle (-100 to 100) is the max duty cycle that will be commanded
     # field weakening (0 to 100) is the percent of field weaking you desire
     # returns tuple of each phase's duty cycle (phase a duty, phase b duty, phase c duty)
-    # Alternating Reverse Space Vector Modulation
+    # Alternating Reversing Sequence Space Vector Pulse Width Modulation
     
     pwm_period = abs(throttle) # 100 #0.00002 # in seconds # this is supposed to be in seconds, but by putting 100 seconds it outputs duty cycle in percent
     duty_cycle = 1 # in percent
@@ -108,7 +108,7 @@ if __name__ == '__main__':
 
         trap_dutys += [trapezoidal(electrical_angle)]
         spwm_dutys += [spwm(electrical_angle, throttle, field_weakening)]
-        svpwm_dutys += [svpwm(electrical_angle, throttle, field_weakening)]
+        svpwm_dutys += [ars_svpwm(electrical_angle, throttle, field_weakening)]
 
         if throttle < 100:
             throttle += 0.15
@@ -143,13 +143,13 @@ if __name__ == '__main__':
     axs[0].plot(electrical_phase, spwm_a, 'g-', electrical_phase, spwm_b, 'b-', electrical_phase, spwm_c, 'r-',
                 electrical_phase, svpwm_a, 'g--', electrical_phase, svpwm_b, 'b--', electrical_phase, svpwm_c, 'r--',)
     axs[0].legend(['SPWM Phase A', 'SPWM Phase B', 'SPWM Phase C',
-                    'SVPWM Phase A', 'SVPWM Phase B', 'SVPWM Phase C'])
+                    'ARS SVPWM Phase A', 'ARS SVPWM Phase B', 'ARS SVPWM Phase C'])
     axs[0].set_ylabel('High side transistor duty cycle (percent)')
     axs[0].set_xlabel('Direct axis angle (deg)')
     axs[0].set_title('Duty cycle for different commutation techniques')
 
     axs[1].plot(electrical_phase, spwm_dV, electrical_phase, svpwm_dV)
-    axs[1].legend(['SPWM', 'SVPWM'])
+    axs[1].legend(['SPWM', 'ARS_SVPWM'])
     axs[1].set_ylabel('Phase to phase voltage (percent of battery voltage)')
     axs[1].set_xlabel('Direct axis angle (deg)')
     axs[1].set_title('Phase voltage for different commutation techniques')

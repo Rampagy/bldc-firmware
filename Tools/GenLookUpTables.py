@@ -8,17 +8,17 @@ if __name__ == '__main__':
     # generate look up tables for spwm and svpwm
     angles = []
     spwm_lut = []
-    svpwm_lut = []
+    ars_svpwm_lut = []
     for angle in range(360):
         angles += [angle]
 
         spwm_lut += [int(round(commutation_techniques.spwm(angle, 100, 100)[0]))]
-        svpwm_lut += [int(round(commutation_techniques.svpwm(angle, 100, 100)[0]))]
+        ars_svpwm_lut += [int(round(commutation_techniques.ars_svpwm(angle, 100, 100)[0]))]
 
 
     # recreate each phase for the commutation method using the lookup tables to ensure they are correct
     spwm_phases = []
-    svpwm_phases = []
+    ars_svpwm_phases = []
     for angle in range(360):
         # always 0% field weakening
         a = (angle + 90) % 360
@@ -26,11 +26,11 @@ if __name__ == '__main__':
         c = (angle + 90 + 120) % 360
 
         spwm_phases += [[spwm_lut[a], spwm_lut[b], spwm_lut[c]]]
-        svpwm_phases += [[svpwm_lut[a], svpwm_lut[b], svpwm_lut[c]]]
+        ars_svpwm_phases += [[ars_svpwm_lut[a], ars_svpwm_lut[b], ars_svpwm_lut[c]]]
 
     # look up tables
     spwm_lut_var = csnake.Variable('SPWM_LUT', 'uint8_t', value=spwm_lut)
-    svpwm_lut_var = csnake.Variable('SVPWM_LUT', 'uint8_t', value=svpwm_lut)
+    ars_svpwm_lut_var = csnake.Variable('ARS_SVPWM_LUT', 'uint8_t', value=ars_svpwm_lut)
     
     # duty cycle structure
     duty_cycle_struct = csnake.Struct('Duty_Cycle_Struct', typedef=True)
@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
     # commutation type
     comm_type_enum = csnake.Enum('commutation_type_enum', typedef=True)
-    comm_type_enum.add_values( ['spwm_e', 'svpwm_e'] )
+    comm_type_enum.add_values( ['spwm_e', 'ars_svpwm_e'] )
 
     # variables
     direct_axis_var = csnake.Variable('direct_axis_angle', 'uint16_t')
@@ -83,10 +83,10 @@ if __name__ == '__main__':
     cw.add_line(comment='Lookup table used for Sinusoidal PWM commutation')
     cw.add_variable_initialization(spwm_lut_var)
     cw.add_line()
-    cw.add_line(comment='Lookup table used for Space Vector PWM commutation:')
+    cw.add_line(comment='Lookup table used for Alternating Reversing Sequence Space Vector PWM commutation:')
     cw.add_line(comment='Understanding Space Vector Modulation by Peter Pinewski https://go.gale.com/ps/i.do?id=GALE%7CA18320578&sid=sitemap&v=2.1&it=r&p=AONE&sw=w&userGroupName=anon%7Ebc1f9809')
     cw.add_line(comment='https://youtu.be/5eQyoVMz1dY')
-    cw.add_variable_initialization(svpwm_lut_var)
+    cw.add_variable_initialization(ars_svpwm_lut_var)
     cw.add_line()
     cw.write_to_file('../include/CommutationLookupTable.ch')
 
@@ -94,7 +94,7 @@ if __name__ == '__main__':
     fig, axs = plt.subplots(3)
 
     axs[0].set_title('Lookup Table Results')
-    axs[0].plot(angles, spwm_lut, 'b-', angles, svpwm_lut, 'g--')
+    axs[0].plot(angles, spwm_lut, 'b-', angles, ars_svpwm_lut, 'g--')
     axs[0].legend(['spwm', 'svpwm'])
     axs[0].set_xlabel('Direct Axis Angle, deg')
     axs[0].set_ylabel('High Side Transistor Duty Cycle, percent')
@@ -105,8 +105,8 @@ if __name__ == '__main__':
     axs[1].set_xlabel('Direct Axis Angle, deg')
     axs[1].set_ylabel('High Side Transistor Duty Cycle, percent')
 
-    axs[2].set_title('3 phase recreation using the SVPWM LUT')
-    axs[2].plot(angles, svpwm_phases)
+    axs[2].set_title('3 phase recreation using the ARS SVPWM LUT')
+    axs[2].plot(angles, ars_svpwm_phases)
     axs[2].legend(['a', 'b', 'c'])
     axs[2].set_xlabel('Direct Axis Angle, deg')
     axs[2].set_ylabel('High Side Transistor Duty Cycle, percent')
