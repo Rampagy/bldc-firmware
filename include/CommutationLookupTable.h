@@ -22,7 +22,8 @@
 typedef enum
 {
     spwm_e,
-    ars_svpwm_e
+    ars_svpwm_e,
+    nullv0_svpwm_e
 } commutation_type_enum;
 
 typedef struct

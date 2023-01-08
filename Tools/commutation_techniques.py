@@ -65,11 +65,6 @@ def ars_svpwm(direct_axis, throttle, field_weakening):
     T2 = pwm_period * duty_cycle * math.sin( degToRad(alpha) )
     T0 = pwm_period - T1 - T2
 
-    #w = 0.5*T0 + T2
-    #x = 0.5*T0
-    #y = 0.5*T0 + T1
-    #z = 0.5*T0 + T1 + T2
-
     # this -30 is bugging me, but idk how to get rid of it
     sector = (quadrature_axis // 60) % 6
     if sector == 0: # sector 1
@@ -92,12 +87,57 @@ def ars_svpwm(direct_axis, throttle, field_weakening):
         return ( T1+T2+0.5*T0, 0.5*T0, T1+0.5*T0 )
 
 
+
+def nullv0_svpwm(direct_axis, throttle, field_weakening):
+    # throttle (-100 to 100) is the max duty cycle that will be commanded
+    # field weakening (0 to 100) is the percent of field weaking you desire
+    # returns tuple of each phase's duty cycle (phase a duty, phase b duty, phase c duty)
+    # Null = V0 Space Vector Pulse Width Modulation
+    
+    pwm_period = abs(throttle) # 100 #0.00002 # in seconds # this is supposed to be in seconds, but by putting 100 seconds it outputs duty cycle in percent
+    duty_cycle = 1 # in percent
+    sign = -1 if throttle < 0 else 1
+
+    # control to 90 degrees ahead of the direct axis
+    # to go in reverse swap +90 with -90
+    # to field weaken change +/-90 to something closer to 0
+    quadrature_axis = direct_axis + sign*90*(100-field_weakening)/100
+
+    # this -30 is bugging me, but idk how to get rid of it
+    alpha = quadrature_axis % 60
+    T1 = pwm_period * duty_cycle * math.sin( degToRad(60-alpha) )
+    T2 = pwm_period * duty_cycle * math.sin( degToRad(alpha) )
+    T0 = pwm_period - T1 - T2
+
+    # this -30 is bugging me, but idk how to get rid of it
+    sector = (quadrature_axis // 60) % 6
+    if sector == 0: # sector 1
+        # 0 to 60 degrees
+        return ( T1+T2, T2, 0 )
+    elif sector == 1: # sector 2
+        # 60 to 120 degrees
+        return ( T1, T1+T2, 0 )
+    elif sector == 2: # sector 3
+        # 120 to 180 degrees
+        return ( 0, T1+T2, T2 )
+    elif sector == 3: # sector 4
+        # 180 to 240 degrees
+        return ( 0, T1, T1+T2 )
+    elif sector == 4: # sector 5
+        # 240 to 300 degrees
+        return ( T2, 0, T1+T2 )
+    elif sector == 5: # sector 6
+        # 300 to 360 degrees
+        return ( T1+T2, 0, T1 )
+
+
 if __name__ == '__main__':
     import matplotlib.pyplot as plt # only needed if this is the main script being run
 
     trap_dutys = []
     spwm_dutys = []
-    svpwm_dutys = []
+    ars_svpwm_dutys = []
+    nullv0_svpwm_dutys = []
     electrical_phase = []
 
     # electrical angle is the direct axis angle
@@ -108,7 +148,8 @@ if __name__ == '__main__':
 
         trap_dutys += [trapezoidal(electrical_angle)]
         spwm_dutys += [spwm(electrical_angle, throttle, field_weakening)]
-        svpwm_dutys += [ars_svpwm(electrical_angle, throttle, field_weakening)]
+        ars_svpwm_dutys += [ars_svpwm(electrical_angle, throttle, field_weakening)]
+        nullv0_svpwm_dutys += [nullv0_svpwm(electrical_angle, throttle, field_weakening)]
 
         if throttle < 100:
             throttle += 0.15
@@ -125,31 +166,43 @@ if __name__ == '__main__':
         spwm_b += [b1]
         spwm_c += [c1]
 
-    svpwm_a = []
-    svpwm_b = []
-    svpwm_c = []
-    for a1, b1, c1 in svpwm_dutys:
-        svpwm_a += [a1]
-        svpwm_b += [b1]
-        svpwm_c += [c1]
+    ars_svpwm_a = []
+    ars_svpwm_b = []
+    ars_svpwm_c = []
+    for a1, b1, c1 in ars_svpwm_dutys:
+        ars_svpwm_a += [a1]
+        ars_svpwm_b += [b1]
+        ars_svpwm_c += [c1]
+
+
+    nullv0_svpwm_a = []
+    nullv0_svpwm_b = []
+    nullv0_svpwm_c = []
+    for a1, b1, c1 in nullv0_svpwm_dutys:
+        nullv0_svpwm_a += [a1]
+        nullv0_svpwm_b += [b1]
+        nullv0_svpwm_c += [c1]
 
     # determine the delta voltage (as a percent of VBatt) for each commutation type
     spwm_dV = [max(a, b, c) - min(a, b, c) for a, b, c in spwm_dutys]
-    svpwm_dV = [max(a, b, c) - min(a, b, c) for a, b, c in svpwm_dutys]
+    ars_svpwm_dV = [max(a, b, c) - min(a, b, c) for a, b, c in ars_svpwm_dutys]
+    nullv0_svpwm_dV = [max(a, b, c) - min(a, b, c) for a, b, c in nullv0_svpwm_dutys]
 
     fig, axs = plt.subplots(2)
     fig.suptitle('Commutation techniques')
 
     axs[0].plot(electrical_phase, spwm_a, 'g-', electrical_phase, spwm_b, 'b-', electrical_phase, spwm_c, 'r-',
-                electrical_phase, svpwm_a, 'g--', electrical_phase, svpwm_b, 'b--', electrical_phase, svpwm_c, 'r--',)
+                electrical_phase, ars_svpwm_a, 'g--', electrical_phase, ars_svpwm_b, 'b--', electrical_phase, ars_svpwm_c, 'r--',
+                electrical_phase, nullv0_svpwm_a, 'g:', electrical_phase, nullv0_svpwm_b, 'b:', electrical_phase, nullv0_svpwm_c, 'r:',)
     axs[0].legend(['SPWM Phase A', 'SPWM Phase B', 'SPWM Phase C',
-                    'ARS SVPWM Phase A', 'ARS SVPWM Phase B', 'ARS SVPWM Phase C'])
+                    'ARS SVPWM Phase A', 'ARS SVPWM Phase B', 'ARS SVPWM Phase C',
+                    'Null=V0 Phase A', 'Null=V0 Phase B', 'Null=V0 Phase C'])
     axs[0].set_ylabel('High side transistor duty cycle (percent)')
     axs[0].set_xlabel('Direct axis angle (deg)')
     axs[0].set_title('Duty cycle for different commutation techniques')
 
-    axs[1].plot(electrical_phase, spwm_dV, electrical_phase, svpwm_dV)
-    axs[1].legend(['SPWM', 'ARS_SVPWM'])
+    axs[1].plot(electrical_phase, spwm_dV, electrical_phase, ars_svpwm_dV, electrical_phase, nullv0_svpwm_dV)
+    axs[1].legend(['SPWM', 'ARS_SVPWM', 'NULL_V0_SVPWM'])
     axs[1].set_ylabel('Phase to phase voltage (percent of battery voltage)')
     axs[1].set_xlabel('Direct axis angle (deg)')
     axs[1].set_title('Phase voltage for different commutation techniques')
