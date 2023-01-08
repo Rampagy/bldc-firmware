@@ -1,7 +1,7 @@
 @echo off
 
 :: build test executable
-gcc -I..\include test_CommutationLookupTable.c ..\CommutationLookupTable.c unity/unity.c -o test_CommutationLookupTable
+gcc -Wdouble-promotion -m32 -Wall -Wextra -I..\include test_CommutationLookupTable.c ..\CommutationLookupTable.c unity/unity.c -o test_CommutationLookupTable
 
 :: generate new solutions
 python ../Tools/gen_test_solutions.py

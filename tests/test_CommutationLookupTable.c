@@ -16,7 +16,6 @@ void test_spwm_commutation(void)
     Duty_Cycle_Struct phase_dutys;
     char line[1024];
     int line_num = 1;
-    int tolerance = 1;
 
     // read test solutions
     FILE* stream = fopen("solutions/spwm.csv", "r");
@@ -53,7 +52,6 @@ void test_svpwm_commutation(void)
     Duty_Cycle_Struct phase_dutys;
     char line[1024];
     int line_num = 1;
-    int tolerance = 1;
 
     // read test solutions
     FILE* stream = fopen("solutions/ars_svpwm.csv", "r");
@@ -87,6 +85,9 @@ void test_svpwm_commutation(void)
 
 int main (int argc, char* args[])
 {
+    (void)argc;
+    (void)args;
+
     UNITY_BEGIN();
     RUN_TEST(test_spwm_commutation);
     RUN_TEST(test_svpwm_commutation);
