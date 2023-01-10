@@ -127,6 +127,6 @@ int main (int argc, char* args[])
     UNITY_BEGIN();
     RUN_TEST(test_spwm_commutation);
     RUN_TEST(test_ars_svpwm_commutation);
-    RUN_TEST(test_nullv0_svpwm_commutation);
+	RUN_TEST(test_nullv0_svpwm_commutation);
     return UNITY_END();
 }

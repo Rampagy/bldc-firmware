@@ -43,6 +43,13 @@ Duty_Cycle_Struct GetPWMDutyCycles(uint16_t direct_axis_angle, int8_t throttle_p
             duty_cycles.b = ARS_SVPWM_LUT[lookup_angle_b];
             duty_cycles.c = ARS_SVPWM_LUT[lookup_angle_c];
             break;
+			
+        case nullv0_svpwm_e:
+            /* use space vector pwm LUT */
+            duty_cycles.a = NULLV0_SVPWM_LUT[lookup_angle_a];
+            duty_cycles.b = NULLV0_SVPWM_LUT[lookup_angle_b];
+            duty_cycles.c = NULLV0_SVPWM_LUT[lookup_angle_c];
+            break;
     } /* ~switch (commutation_type) */
 
 

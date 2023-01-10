@@ -34,4 +34,4 @@ if __name__ == '__main__':
 
     save_solutions('../tests/solutions/spwm.csv', spwm_phases)
     save_solutions('../tests/solutions/ars_svpwm.csv', ars_svpwm_phases)
-    save_solutions('../tests/solutions/nullv0_svpwm.csv', ars_svpwm_phases)
+    save_solutions('../tests/solutions/nullv0_svpwm.csv', nullv0_svpwm_phases)
