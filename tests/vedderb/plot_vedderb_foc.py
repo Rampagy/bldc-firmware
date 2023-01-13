@@ -19,12 +19,10 @@ if __name__=='__main__':
 
 
 	fig, axs = plt.subplots(1)
-	fig.suptitle('Commutation techniques')
-
 	axs.plot(angles, dutyA, 'g-', angles, dutyB, 'b-', angles, dutyC, 'r-')
 	axs.legend(['FOC Phase A', 'FOC Phase B', 'FOC Phase C'])
-	axs.set_ylabel('High side transistor duty cycle (percent)')
+	axs.set_ylabel('High side transistor duty cycle time (PWMFullDutyCycle = 1000)')
 	axs.set_xlabel('Direct axis angle (deg)')
-	axs.set_title('Duty cycle for different commutation techniques')
+	axs.set_title('Ben Vedder FOC duty cycles')
 
 	plt.show()
