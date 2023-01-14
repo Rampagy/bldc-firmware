@@ -1,60 +1,22 @@
-# Individually Addressable LEDs
+# STM32F4 Null=V0 performance tests
 
-Example code using the onboard DSP, FreeRTOS, and DMA to control individually addressable LEDs (SK6812).  This project has both non-audio patterns and audio syncing patterns.
+The goal is that the 'new' Null=V0 implementation will will have comparable performance to the previous Alternating-Reversing Sequence commutation.
 
-Non-audio syncing patterns: https://youtu.be/5Bn3eNN9Ki0
+## Methodology
 
-Setup + Audio syncing patterns: https://youtu.be/zrTWR6r1QTw
+Five different methods performance will be tested using an STM32F4 discovery board:
 
-## Architecture
+1. Original implementation (alternating-reversing sequence)
+1. Using [math.h](https://cplusplus.com/reference/cmath/) (null=v0)
+1. Using [utils_math.h](https://github.com/vedderb/bldc/blob/master/util/utils_math.c) (null=v0)
+1. Using [onboard dsp](https://www.keil.com/pack/doc/CMSIS/DSP/html/index.html) (null=v0)
+1. A hybrid of all of the above taking the fastest part from each (we'll see if I get to this one)
 
-The idea is to use 2 different tasks to manage the LEDs. The tasks are listed below by priority (higher numbers will preempt lower numbers).  I realize they could probably all be combined into one task, but more tasks means more learning.
+Optimization [-O2](https://developer.arm.com/documentation/dui0375/g/Compiler-Command-line-Options/-Onum?lang=en) will be used as that's what's currently being used in the project.
 
-0.  Idle Task
-    -  Does nothing
-1.  Pattern Task
-    - Decides what pattern to show
-    - Calculates RGB color based on selected pattern
-    - 10ms (100 Hz)
-2.  Refresh Task
-    - Refreshes the actual colors shown on the LED strip
-        - Initiates PWM pulse train
-    - 10ms (100 Hz)
+## Results
 
-## Peripherals
-
-#### Timers
-
-```
-Timer 2: 44.1 kHz timer for sampling audio voltage data 
-Timer 4: LED Data Line
-Timer 12: Collects runtime statistics (task time, computation times, ...)
-```
-
-#### GPIO:
-
-```
-C4: Audio voltage data in
-B6: LED Data out
-D12: LED4 (GRN) - Indicates stack overflow for vCreatePattern
-D13: LED3 (ORG) - Indicates stack overflow for vUpdateLedStrip
-D14: LED5 (RED)
-D15: LED6 (BLU)
-```
-
-#### DMA:
-
-```
-DMA1 Stream 0: Transfer duty cycles to PWM module.
-DMA2 Stream 0: Transfer ADC1->DR to buffers (used in double buffer mode).
-```
-
-#### ADCs:
-
-```
-ADC1 Channel 14: Samples audio voltage
-```
-
+TBD
 
 ## Resources
 
@@ -79,18 +41,3 @@ https://community.st.com/s/question/0D50X00009XkibiSAB/stm32f207-adctimerdma-poo
 https://arm-software.github.io/CMSIS_5/DSP/html/index.html
 
 https://www.freertos.org/FreeRTOS-Coding-Standard-and-Style-Guide.html
-
-## Notes
-Use `xTaskCreateStatic` to create a task with the stack in a static location
-
-Use `xTaskCreate` to create a task with the stack in a dynamic location
-
-Use `vTaskDelayUntil` to schedule task to be run again
-
-Use `uxTaskGetStackHighWaterMark` to see the highest of stack usage
-
-Use `taskENTER_CRITICAL` to disable interrupts and tasks
-
-Use `taskEXIT_CRITICAL` to re-enable interrupts and tasks
-
-Use `portTICK_PERIOD_MS` to determine period of one clock tick/cycle

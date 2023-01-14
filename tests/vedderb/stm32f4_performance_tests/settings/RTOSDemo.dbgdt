@@ -1247,7 +1247,7 @@
                     <item>ucB</item>
                     <item>percent_complete</item>
                     <item>ufFourierFrequency</item>
-                    <item></item>
+                    <item />
                 </expressions>
                 <col-names>
                     <item>Expression</item>

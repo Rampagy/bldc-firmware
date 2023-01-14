@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Alex Simon\Desktop\Software\Individually-Addressable-LEDs\settings\RTOSDemo.Flash_Debug.general.xcl" --backend -f "C:\Users\Alex Simon\Desktop\Software\Individually-Addressable-LEDs\settings\RTOSDemo.Flash_Debug.driver.xcl" 
+& "C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Alex Simon\Desktop\Software\bldc-firmware\tests\vedderb\stm32f4_performance_tests\settings\RTOSDemo.Flash_Debug.general.xcl" --backend -f "C:\Users\Alex Simon\Desktop\Software\bldc-firmware\tests\vedderb\stm32f4_performance_tests\settings\RTOSDemo.Flash_Debug.driver.xcl" 
 }
 else
 {
-& "C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Alex Simon\Desktop\Software\Individually-Addressable-LEDs\settings\RTOSDemo.Flash_Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\Alex Simon\Desktop\Software\Individually-Addressable-LEDs\settings\RTOSDemo.Flash_Debug.driver.xcl" 
+& "C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Alex Simon\Desktop\Software\bldc-firmware\tests\vedderb\stm32f4_performance_tests\settings\RTOSDemo.Flash_Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\Alex Simon\Desktop\Software\bldc-firmware\tests\vedderb\stm32f4_performance_tests\settings\RTOSDemo.Flash_Debug.driver.xcl" 
 }
