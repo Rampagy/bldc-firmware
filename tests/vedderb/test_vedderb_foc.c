@@ -2,14 +2,16 @@
 #include <math.h>
 #include <stdio.h>
 
+#define MAX_AMPLITUDE			(0.866025403784439f)	// max alpha and beta magnitude
+#define ONE_OVER_MAX_AMPLITUDE	(1.0f/MAX_AMPLITUDE)	// reciprocal of max alpha and beta magnitude
+#define PI_OVER_180				(0.01745329251f)		// pi/180
 
-#define ONE_OVER_MAX_AMPLITUDE	(1.0f/0.866025403784439f)
-#define PI_OVER_3				(1.0471975512f)  // 60 degrees
-#define TWO_PI_OVER_3			(2.0f*PI_OVER_3) // 120 degrees
-#define THREE_PI_OVER_3			(3.0f*PI_OVER_3) // 180 degrees
-#define FOUR_PI_OVER_3			(4.0f*PI_OVER_3) // 240 degrees
-#define FIVE_PI_OVER_3			(5.0f*PI_OVER_3) // 300 degrees
-#define SIX_PI_OVER_3			(6.0f*PI_OVER_3) // 360 degrees
+#define PI_OVER_3				(1.0471975512f)		// 60 degrees
+#define TWO_PI_OVER_3			(2.0f*PI_OVER_3)	// 120 degrees
+#define THREE_PI_OVER_3			(3.0f*PI_OVER_3)	// 180 degrees
+#define FOUR_PI_OVER_3			(4.0f*PI_OVER_3)	// 240 degrees
+#define FIVE_PI_OVER_3			(5.0f*PI_OVER_3)	// 300 degrees
+#define SIX_PI_OVER_3			(6.0f*PI_OVER_3)	// 360 degrees
 
 // https://opensource.apple.com/source/Libm/Libm-315/Source/ARM/fmodf.c.auto.html
 float fmodf_custom( float x, float y )
@@ -239,11 +241,10 @@ int main (int argc, char* args[]) {
 		float alpha, beta = 0.0f;
 
 		// determine the alpha-beta vectors from angle-magnitude
-		// magnitude is always 1000
-		beta = 0.866025403784439f*sinf( (float)i*0.01745329251f );
-		alpha = 0.866025403784439f*cosf( (float)i*0.01745329251f );
+		beta = MAX_AMPLITUDE*sinf( (float)i*PI_OVER_180 );
+		alpha = MAX_AMPLITUDE*cosf( (float)i*PI_OVER_180 );
 
-		// do the math
+		// magnitude is always 1000 (for this test)
 		foc_svm(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector );
 
 		// write to file
