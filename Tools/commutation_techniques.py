@@ -188,6 +188,8 @@ if __name__ == '__main__':
     ars_svpwm_dV = [max(a, b, c) - min(a, b, c) for a, b, c in ars_svpwm_dutys]
     nullv0_svpwm_dV = [max(a, b, c) - min(a, b, c) for a, b, c in nullv0_svpwm_dutys]
 
+    print(max(spwm_dV))
+
     fig, axs = plt.subplots(2)
     fig.suptitle('Commutation techniques')
 
