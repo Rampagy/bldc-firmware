@@ -8,9 +8,11 @@
 
 typedef struct
 {
-    uint16_t usPatternClocks;
-    uint16_t usUpdateLEDsClocks;
-    uint16_t usCopyADCsFromDMAClocks;
+    uint32_t foc0Clocks;
+    uint32_t foc1Clocks;
+    uint32_t foc2Clocks;
+    uint32_t foc3Clocks;
+	uint32_t foc4Clocks;
 } xDebugStats_t;
 
 /*-----------------------------------------------------------*/

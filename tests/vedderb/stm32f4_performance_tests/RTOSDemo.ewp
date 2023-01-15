@@ -663,7 +663,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>48</hasPrio>
+                <hasPrio>1</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>
@@ -1247,36 +1247,30 @@
         </group>
     </group>
     <file>
-        <name>$PROJ_DIR$\audio.c</name>
-    </file>
-    <file>
-        <name>$PROJ_DIR$\audio.h</name>
-    </file>
-    <file>
         <name>$PROJ_DIR$\debug.c</name>
     </file>
     <file>
         <name>$PROJ_DIR$\debug.h</name>
     </file>
     <file>
+        <name>$PROJ_DIR$\foc.c</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\foc.h</name>
+    </file>
+    <file>
         <name>$PROJ_DIR$\FreeRTOSConfig.h</name>
-    </file>
-    <file>
-        <name>$PROJ_DIR$\leds.c</name>
-    </file>
-    <file>
-        <name>$PROJ_DIR$\leds.h</name>
     </file>
     <file>
         <name>$PROJ_DIR$\main.c</name>
     </file>
     <file>
-        <name>$PROJ_DIR$\pattern.c</name>
-    </file>
-    <file>
-        <name>$PROJ_DIR$\pattern.h</name>
-    </file>
-    <file>
         <name>$PROJ_DIR$\stm32f4xx_it.c</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\utils_math.c</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\utils_math.h</name>
     </file>
 </project>

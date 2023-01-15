@@ -26,35 +26,27 @@
  */
 
 /* Kernel includes. */
-#include "FreeRTOS.h"
-#include "task.h"
-#include "timers.h"
-#include "semphr.h"
+//#include "FreeRTOS.h"
+//#include "task.h"
+//#include "timers.h"
+//#include "semphr.h"
 
-/* Project includes. */
-#include "system_stm32f4xx.h"
-#include "leds.h"
-#include "pattern.h"
-#include "audio.h"
-#include "stm32f4xx_rcc.h"
+#include <stdint.h>
+#include <math.h>
 
 /* Hardware and starter kit includes. */
 #include "arm_comm.h"
 #include "stm32f4_discovery.h"
 #include "stm32f4xx.h"
 #include "stm32f4xx_conf.h"
+#include "system_stm32f4xx.h"
 
-/* Priorities for the demo application tasks (higher numbers preempt lower numbers) */
-#define mainUPDATE_LEDS_PRIORITY                ( tskIDLE_PRIORITY + 2UL )
-#define mainCREATE_PATTERN_PRIORITY             ( tskIDLE_PRIORITY + 1UL )
+/* Project includes. */
+#include "stm32f4xx_rcc.h"
+#include "debug.h"
+#include "foc.h"
 
-/* Task stack sizes. */
-#define configUPDATE_LEDS_STACK_SIZE            (configMINIMAL_STACK_SIZE * 10)
-#define configCREATE_PATTERN_STACK_SIZE         (configMINIMAL_STACK_SIZE * 40)
-
-/* Task Handles. */
-extern TaskHandle_t xUpdateLedsHandle;
-extern TaskHandle_t xCreatePatternHandle;
+extern xDebugStats_t xDebugStats;
 
 /*-----------------------------------------------------------*/
 
@@ -71,33 +63,51 @@ int main(void)
     SystemCoreClockUpdate();
 
     /* Initialize all four LEDs built into the starter kit */
-    STM_EVAL_LEDInit( LED3 );       // Update LEDs stack overflow (ORG)
-    STM_EVAL_LEDInit( LED4 );       // Create Pattern stack overflow (GRN)
-    STM_EVAL_LEDInit( LED5 );       // Sample timer complete before ADC conversion (RED)
+    STM_EVAL_LEDInit( LED3 );
+    STM_EVAL_LEDInit( LED4 );
+    STM_EVAL_LEDInit( LED5 );
     STM_EVAL_LEDInit( LED6 );
 
-    /* Initialize the debug timer. */
+    /* Initialize the debug/performance timer. */
     vInitDebug();
 
-    /* Initialize the individually addressable LEDs. */
-    vInitLeds();
+	/* performance test*/
+	uint16_t startTime, stopTime = 0u;
+	for (volatile int i = 0; i < 10; i++) {
+		for (float j = 0.0f; j < 360.0f; j += 0.1f) {
+			uint32_t tAout, tBout, tCout, sector = 0u;
 
-    /* Initialize the ADC/DMA/DSP instructions. */
-    vInitAudio();
+			// determine the alpha-beta vectors from angle-magnitude
+			float beta = MAX_AMPLITUDE*sinf( (float)j*PI_OVER_180 );
+			float alpha = MAX_AMPLITUDE*cosf( (float)j*PI_OVER_180 );
 
-    /* Spawn the tasks. */
-    /*           Task,                  Task Name,          Stack Size,                             parameters,     priority,                           task handle */
-    xTaskCreate( vUpdateLedStrip,       "UpdateLeds",       configUPDATE_LEDS_STACK_SIZE,           NULL,           mainUPDATE_LEDS_PRIORITY,           &xUpdateLedsHandle );
-    xTaskCreate( vCreatePattern,        "CreatePattern",    configCREATE_PATTERN_STACK_SIZE,        NULL,           mainCREATE_PATTERN_PRIORITY,        &xCreatePatternHandle );
+			startTime = TIM12->CNT;
+			foc_svm0(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector);
+			stopTime = TIM12->CNT;
+			xDebugStats.foc0Clocks += (uint32_t)((uint16_t)(stopTime - startTime));
 
-    /* Start the scheduler. */
-    vTaskStartScheduler();
+			startTime = TIM12->CNT;
+			foc_svm1(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector);
+			stopTime = TIM12->CNT;
+			xDebugStats.foc1Clocks += (uint32_t)((uint16_t)(stopTime - startTime));
+			
+			startTime = TIM12->CNT;
+			foc_svm2(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector);
+			stopTime = TIM12->CNT;
+			xDebugStats.foc2Clocks += (uint32_t)((uint16_t)(stopTime - startTime));
+			
+			startTime = TIM12->CNT;
+			foc_svm3(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector);
+			stopTime = TIM12->CNT;
+			xDebugStats.foc3Clocks += (uint32_t)((uint16_t)(stopTime - startTime));
+			
+			startTime = TIM12->CNT;
+			foc_svm4(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector);
+			stopTime = TIM12->CNT;
+			xDebugStats.foc4Clocks += (uint32_t)((uint16_t)(stopTime - startTime));
+		}
+	}
 
-    /* If all is well, the scheduler will now be running, and the following line
-    will never be reached.  If the following line does execute, then there was
-    insufficient FreeRTOS heap memory available for the idle and/or timer tasks
-    to be created.  See the memory management section on the FreeRTOS web site
-    for more details. */
-    while ( 1 );
+	while ( 1 );
 }
 /*-----------------------------------------------------------*/
