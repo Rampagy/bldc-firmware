@@ -469,3 +469,97 @@ void foc_svm4(float alpha, float beta, uint32_t PWMFullDutyCycle,
 	*tCout = tC;
 	*svm_sector = sector;
 }
+
+
+#define USE_ONBOARD_DSP
+// using onboard dsp w/ sector determination from the original implementation
+void foc_svm5(float alpha, float beta, uint32_t PWMFullDutyCycle,
+				uint32_t* tAout, uint32_t* tBout, uint32_t* tCout, uint32_t *svm_sector) {
+	/* Null = V0 SVPWM (reduces switching losses by up to 33%) */
+
+	uint32_t sector;
+	float angle, T1, T2, magnitude, temp, a;
+	uint32_t tA, tB, tC;	// PWM timings
+
+	// get angle
+#ifdef USE_ONBOARD_DSP
+	// requires at least v1.10.0 of the cmsis lib
+	// https://github.com/ARM-software/CMSIS-DSP/releases
+	(void)arm_atan2_f32(beta, alpha, &angle);
+#else
+	angle = atan2f(beta, alpha); // from math.h
+#endif
+
+	// convert from (-pi, pi) to (0, 2*pi) via branchless programming
+	angle = angle + (angle < 0)*SIX_PI_OVER_3;
+	a = fmodf(angle, PI_OVER_3); // from math.h
+	sector = ((uint32_t)(a / PI_OVER_3) % 6u) + 1;
+
+	// determine magnitude
+#ifdef USE_ONBOARD_DSP
+	(void)arm_sqrt_f32(SQ(alpha)+SQ(beta), &magnitude); // using onbaord dsp
+#else
+	magnitude = hypotf(alpha, beta); // from math.h
+#endif
+
+	// temporary variable for intermediate math
+	temp = (float)PWMFullDutyCycle * magnitude * ONE_OVER_MAX_AMPLITUDE;
+
+#ifdef USE_ONBOARD_DSP
+	T1 = temp * arm_sin_f32(PI_OVER_3 - a); // using arm dsp
+	T2 = temp * arm_sin_f32(a); // using arm dsp
+#else
+	T1 = temp * sinf(PI_OVER_3 - a) * ONE_OVER_MAX_AMPLITUDE; // from math.h
+	T2 = temp * sinf(a) * ONE_OVER_MAX_AMPLITUDE; // from math.h
+#endif
+
+	
+	switch(sector) {
+	case 1: {
+		tA = (uint32_t)(T1+T2);
+		tB = (uint32_t)(T2);
+		tC = (uint32_t)(0);
+		break;
+	}
+	
+	case 2: {
+		tA = (uint32_t)(T1);
+		tB = (uint32_t)(T1+T2);
+		tC = (uint32_t)(0);
+		break;
+	}
+	
+	case 3: {
+		tA = (uint32_t)(0);
+		tB = (uint32_t)(T1+T2);
+		tC = (uint32_t)(T2);
+		break;
+	}
+	
+	case 4: {
+		tA = (uint32_t)(0);
+		tB = (uint32_t)(T1);
+		tC = (uint32_t)(T1+T2);
+		break;
+	}
+	
+	case 5: {
+		tA = (uint32_t)(T2);
+		tB = (uint32_t)(0);
+		tC = (uint32_t)(T1+T2);
+		break;
+	}
+	
+	case 6: {
+		tA = (uint32_t)(T1+T2);
+		tB = (uint32_t)(0);
+		tC = (uint32_t)(T1);
+		break;
+	}
+	}
+
+	*tAout = tA;
+	*tBout = tB;
+	*tCout = tC;
+	*svm_sector = sector;
+}

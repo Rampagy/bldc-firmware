@@ -73,8 +73,8 @@ int main(void)
 
 	/* performance test*/
 	uint16_t startTime, stopTime = 0u;
-	for (volatile int i = 0; i < 10; i++) {
-		for (float j = 0.0f; j < 360.0f; j += 0.1f) {
+	for (volatile int i = 0; i < 100; i++) {
+		for (float j = 0.0f; j < 360.0f; j += 1.0f) {
 			uint32_t tAout, tBout, tCout, sector = 0u;
 
 			// determine the alpha-beta vectors from angle-magnitude
@@ -105,6 +105,11 @@ int main(void)
 			foc_svm4(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector);
 			stopTime = TIM12->CNT;
 			xDebugStats.foc4Clocks += (uint32_t)((uint16_t)(stopTime - startTime));
+			
+			startTime = TIM12->CNT;
+			foc_svm5(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector);
+			stopTime = TIM12->CNT;
+			xDebugStats.foc5Clocks += (uint32_t)((uint16_t)(stopTime - startTime));
 		}
 	}
 

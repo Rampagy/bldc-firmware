@@ -27,5 +27,7 @@ void foc_svm1(float alpha, float beta, uint32_t PWMFullDutyCycle, uint32_t* tAou
 void foc_svm2(float alpha, float beta, uint32_t PWMFullDutyCycle, uint32_t* tAout, uint32_t* tBout, uint32_t* tCout, uint32_t *svm_sector);
 void foc_svm3(float alpha, float beta, uint32_t PWMFullDutyCycle, uint32_t* tAout, uint32_t* tBout, uint32_t* tCout, uint32_t *svm_sector);
 void foc_svm4(float alpha, float beta, uint32_t PWMFullDutyCycle, uint32_t* tAout, uint32_t* tBout, uint32_t* tCout, uint32_t *svm_sector);
+void foc_svm5(float alpha, float beta, uint32_t PWMFullDutyCycle, uint32_t* tAout, uint32_t* tBout, uint32_t* tCout, uint32_t *svm_sector);
+
 
 #endif

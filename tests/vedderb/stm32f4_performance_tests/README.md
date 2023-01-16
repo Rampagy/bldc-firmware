@@ -25,6 +25,8 @@ foc_svm1|552996|7.68 us
 foc_svm2|530506|7.37 us
 foc_svm3|262312|3.64 us
 foc_svm4|354590|4.92 us
+foc_svm5(without USE_ONBOARD_DSP)|518016|7.19 us
+foc_svm5(with USE_ONBOARD_DSP)|
 
 ## Notes
 
