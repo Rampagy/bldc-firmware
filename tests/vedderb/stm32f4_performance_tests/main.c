@@ -33,6 +33,7 @@
 
 #include <stdint.h>
 #include <math.h>
+#include <stdlib.h>
 
 /* Hardware and starter kit includes. */
 #include "arm_comm.h"
@@ -72,14 +73,16 @@ int main(void)
     vInitDebug();
 
 	/* performance test*/
+	volatile uint32_t error = 0;
 	uint16_t startTime, stopTime = 0u;
 	for (volatile int i = 0; i < 100; i++) {
 		for (float j = 0.0f; j < 360.0f; j += 1.0f) {
+			uint32_t tAout_truth, tBout_truth, tCout_truth, sector_truth = 0;
 			uint32_t tAout, tBout, tCout, sector = 0u;
 
 			// determine the alpha-beta vectors from angle-magnitude
-			float beta = MAX_AMPLITUDE*sinf( (float)j*PI_OVER_180 );
-			float alpha = MAX_AMPLITUDE*cosf( (float)j*PI_OVER_180 );
+			float beta = MAX_AMPLITUDE*sinf( j*PI_OVER_180 );
+			float alpha = MAX_AMPLITUDE*cosf( j*PI_OVER_180 );
 
 			startTime = TIM12->CNT;
 			foc_svm0(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector);
@@ -87,7 +90,7 @@ int main(void)
 			xDebugStats.foc0Clocks += (uint32_t)((uint16_t)(stopTime - startTime));
 
 			startTime = TIM12->CNT;
-			foc_svm1(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector);
+			foc_svm1(alpha, beta, (uint32_t)1000u, &tAout_truth, &tBout_truth, &tCout_truth, &sector_truth);
 			stopTime = TIM12->CNT;
 			xDebugStats.foc1Clocks += (uint32_t)((uint16_t)(stopTime - startTime));
 			
@@ -110,6 +113,14 @@ int main(void)
 			foc_svm5(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector);
 			stopTime = TIM12->CNT;
 			xDebugStats.foc5Clocks += (uint32_t)((uint16_t)(stopTime - startTime));
+			
+			if (abs(tAout - tAout_truth) > 1u || 
+					abs(tBout - tBout_truth) > 1u || 
+					abs(tCout - tCout_truth) > 1u || 
+					abs(sector - sector_truth) > 1u) {
+				// shouldn't get here
+				error++;
+			}
 		}
 	}
 

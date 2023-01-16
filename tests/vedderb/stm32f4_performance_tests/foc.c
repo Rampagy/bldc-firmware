@@ -478,7 +478,7 @@ void foc_svm5(float alpha, float beta, uint32_t PWMFullDutyCycle,
 	/* Null = V0 SVPWM (reduces switching losses by up to 33%) */
 
 	uint32_t sector;
-	float angle, T1, T2, magnitude, temp, a;
+	float angle, T1, T2, magnitude, temp;
 	uint32_t tA, tB, tC;	// PWM timings
 
 	// get angle
@@ -492,8 +492,8 @@ void foc_svm5(float alpha, float beta, uint32_t PWMFullDutyCycle,
 
 	// convert from (-pi, pi) to (0, 2*pi) via branchless programming
 	angle = angle + (angle < 0)*SIX_PI_OVER_3;
-	a = fmodf(angle, PI_OVER_3); // from math.h
-	sector = ((uint32_t)(a / PI_OVER_3) % 6u) + 1;
+	sector = ((uint32_t)(angle / PI_OVER_3) % 6u) + 1;
+	angle = fmodf(angle, PI_OVER_3); // from math.h
 
 	// determine magnitude
 #ifdef USE_ONBOARD_DSP
@@ -506,14 +506,14 @@ void foc_svm5(float alpha, float beta, uint32_t PWMFullDutyCycle,
 	temp = (float)PWMFullDutyCycle * magnitude * ONE_OVER_MAX_AMPLITUDE;
 
 #ifdef USE_ONBOARD_DSP
-	T1 = temp * arm_sin_f32(PI_OVER_3 - a); // using arm dsp
-	T2 = temp * arm_sin_f32(a); // using arm dsp
+	T1 = temp * arm_sin_f32(PI_OVER_3 - angle); // using arm dsp
+	T2 = temp * arm_sin_f32(angle); // using arm dsp
 #else
-	T1 = temp * sinf(PI_OVER_3 - a) * ONE_OVER_MAX_AMPLITUDE; // from math.h
-	T2 = temp * sinf(a) * ONE_OVER_MAX_AMPLITUDE; // from math.h
+	T1 = temp * sinf(PI_OVER_3 - angle); // from math.h
+	T2 = temp * sinf(angle); // from math.h
 #endif
 
-	
+
 	switch(sector) {
 	case 1: {
 		tA = (uint32_t)(T1+T2);

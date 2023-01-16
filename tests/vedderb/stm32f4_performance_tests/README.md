@@ -20,21 +20,21 @@ With a 2MHz wall clock doing 36000 iterations
 
 **function**|**clocks**|**time per call**
 :-----:|:-----:|:-----:
-foc_svm0|366071|5.08 us
-foc_svm1|552996|7.68 us
-foc_svm2|530506|7.37 us
-foc_svm3|262312|3.64 us
-foc_svm4|354590|4.92 us
-foc_svm5(without USE_ONBOARD_DSP)|518016|7.19 us
-foc_svm5(with USE_ONBOARD_DSP)|
+foc_svm0|378045|5.25 us
+foc_svm1|550889|7.65 us
+foc_svm2|535851|7.44 us
+foc_svm3|267847|3.72 us
+foc_svm4|360930|5.01 us
+foc_svm5(without USE_ONBOARD_DSP)|519661|7.21 us
+foc_svm5(with USE_ONBOARD_DSP)|304900|4.23 us
 
 ## Notes
 
-foc_svm1, foc_svm2 produced the best results.  By best I mean most accurate and consistent.  foc_svm2 was okay but using utils_fast_atan2() did not have as much precision as the other two methods and it was noticable in the duty cycles (1% to 2% different per phase than the other methods).
+foc_svm2 was okay but using utils_fast_atan2() did not have as much precision as the other two methods and it was noticable in the duty cycles (1% to 2% different per phase than the other methods).
 
-If it were up to me I would use the sector determination from the original logic (foc_svm0) and the dsp code from foc_svm3. Using the result of mathematical operations to determine the sector was causing some issues in foc_svm3 (probably due to loss of precision).
+foc_svm3 is super fast, but I don't trust the sector detection.
 
-My recommendation is foc_svm4.
+My recommendation is foc_svm5 with USE_ONBOARD_DSP.  It provides the best accuracy and is sslightly faster than the original implementation.
 
 ## Resources
 

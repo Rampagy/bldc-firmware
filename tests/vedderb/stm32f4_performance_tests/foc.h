@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "utils_math.h"
+#include "arm_atan2_f32.h" // manually adding because my version of the dsp library doesn't include it
 
 /* Alternating-Reversing Sequence defines */
 //#define ONE_BY_SQRT2			(0.7071067811865475)
