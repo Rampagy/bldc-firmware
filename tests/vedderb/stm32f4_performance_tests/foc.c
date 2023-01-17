@@ -563,3 +563,95 @@ void foc_svm5(float alpha, float beta, uint32_t PWMFullDutyCycle,
 	*tCout = tC;
 	*svm_sector = sector;
 }
+
+
+void foc_svm6(float alpha, float beta, uint32_t PWMFullDutyCycle,
+				uint32_t* tAout, uint32_t* tBout, uint32_t* tCout, uint32_t *svm_sector) {
+	/* Null = V0 SVPWM (reduces switching losses by up to 33%) */
+
+	uint8_t sector;
+	uint32_t tA, tB, tC, N;	// PWM timings
+	float T1, T2, a, b, c, temp = 0.0f;
+	const uint8_t sector_LUT[6] = {6u, 2u, 1u, 4u, 5u, 3u};
+
+
+	a = SQRT3_BY_TWO*alpha - 0.5f*beta;
+	b = beta;
+
+	temp = (float)PWMFullDutyCycle/SQRT3_BY_TWO;
+
+	a *= temp;
+	b *= temp;
+	c = -1.0f*(a+b);
+
+
+	N = (((int32_t)a)>=0) + 2u*(((int32_t)b) >= 0) + 4u*(((int32_t)c) >= 0);
+	sector = sector_LUT[N-1];
+
+	switch(sector) {
+	case 1: {
+		T1 = a;
+		T2 = b;
+
+		tA = (uint32_t)(T1+T2);
+		tB = (uint32_t)(T2);
+		tC = (uint32_t)(0);
+		break;
+	}
+
+	case 2: {
+		T1 = -c;
+		T2 = -a;
+
+		tA = (uint32_t)(T1);
+		tB = (uint32_t)(T1+T2);
+		tC = (uint32_t)(0);
+		break;
+	}
+
+	case 3: {
+		T1 = b;
+		T2 = c;
+
+		tA = (uint32_t)(0);
+		tB = (uint32_t)(T1+T2);
+		tC = (uint32_t)(T2);
+		break;
+	}
+
+	case 4: {
+		T1 = -a;
+		T2 = -b;
+
+		tA = (uint32_t)(0);
+		tB = (uint32_t)(T1);
+		tC = (uint32_t)(T1+T2);
+		break;
+	}
+
+	case 5: {
+		T1 = c;
+		T2 = a;
+
+		tA = (uint32_t)(T2);
+		tB = (uint32_t)(0);
+		tC = (uint32_t)(T1+T2);
+		break;
+	}
+
+	case 6: {
+		T1 = -b;
+		T2 = -c;
+
+		tA = (uint32_t)(T1+T2);
+		tB = (uint32_t)(0);
+		tC = (uint32_t)(T1);
+		break;
+	}
+	}
+
+	*tAout = tA;
+	*tBout = tB;
+	*tCout = tC;
+	*svm_sector = sector;
+}

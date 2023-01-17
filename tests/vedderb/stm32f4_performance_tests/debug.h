@@ -14,6 +14,7 @@ typedef struct
     uint32_t foc3Clocks;
 	uint32_t foc4Clocks;
 	uint32_t foc5Clocks;
+	uint32_t foc6Clocks;
 } xDebugStats_t;
 
 /*-----------------------------------------------------------*/

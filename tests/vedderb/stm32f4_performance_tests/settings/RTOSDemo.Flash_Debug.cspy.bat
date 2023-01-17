@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Alex Simon\Desktop\Software\bldc-firmware\tests\vedderb\stm32f4_performance_tests\settings\RTOSDemo.Flash_Debug.general.xcl" --backend -f "C:\Users\Alex Simon\Desktop\Software\bldc-firmware\tests\vedderb\stm32f4_performance_tests\settings\RTOSDemo.Flash_Debug.driver.xcl" 
+"C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "D:\Software\bldc-firmware\tests\vedderb\stm32f4_performance_tests\settings\RTOSDemo.Flash_Debug.general.xcl" --backend -f "D:\Software\bldc-firmware\tests\vedderb\stm32f4_performance_tests\settings\RTOSDemo.Flash_Debug.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Alex Simon\Desktop\Software\bldc-firmware\tests\vedderb\stm32f4_performance_tests\settings\RTOSDemo.Flash_Debug.general.xcl" "--debug_file=%~1" --backend -f "C:\Users\Alex Simon\Desktop\Software\bldc-firmware\tests\vedderb\stm32f4_performance_tests\settings\RTOSDemo.Flash_Debug.driver.xcl" 
+"C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "D:\Software\bldc-firmware\tests\vedderb\stm32f4_performance_tests\settings\RTOSDemo.Flash_Debug.general.xcl" "--debug_file=%~1" --backend -f "D:\Software\bldc-firmware\tests\vedderb\stm32f4_performance_tests\settings\RTOSDemo.Flash_Debug.driver.xcl" 
 
 @echo off 
 :end

@@ -75,8 +75,8 @@ int main(void)
 	/* performance test*/
 	volatile uint32_t error = 0;
 	uint16_t startTime, stopTime = 0u;
-	for (volatile int i = 0; i < 100; i++) {
-		for (float j = 0.0f; j < 360.0f; j += 1.0f) {
+	for (volatile int i = 0; i < 10; i++) {
+		for (float j = 0.0f; j < 360.0f; j += 0.1f) {
 			uint32_t tAout_truth, tBout_truth, tCout_truth, sector_truth = 0;
 			uint32_t tAout, tBout, tCout, sector = 0u;
 
@@ -95,24 +95,9 @@ int main(void)
 			xDebugStats.foc1Clocks += (uint32_t)((uint16_t)(stopTime - startTime));
 			
 			startTime = TIM12->CNT;
-			foc_svm2(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector);
+			foc_svm6(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector);
 			stopTime = TIM12->CNT;
-			xDebugStats.foc2Clocks += (uint32_t)((uint16_t)(stopTime - startTime));
-			
-			startTime = TIM12->CNT;
-			foc_svm3(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector);
-			stopTime = TIM12->CNT;
-			xDebugStats.foc3Clocks += (uint32_t)((uint16_t)(stopTime - startTime));
-			
-			startTime = TIM12->CNT;
-			foc_svm4(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector);
-			stopTime = TIM12->CNT;
-			xDebugStats.foc4Clocks += (uint32_t)((uint16_t)(stopTime - startTime));
-			
-			startTime = TIM12->CNT;
-			foc_svm5(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector);
-			stopTime = TIM12->CNT;
-			xDebugStats.foc5Clocks += (uint32_t)((uint16_t)(stopTime - startTime));
+			xDebugStats.foc6Clocks += (uint32_t)((uint16_t)(stopTime - startTime));
 			
 			if (abs(tAout - tAout_truth) > 1u || 
 					abs(tBout - tBout_truth) > 1u || 

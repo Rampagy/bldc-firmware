@@ -7,8 +7,9 @@
 
 /* Alternating-Reversing Sequence defines */
 //#define ONE_BY_SQRT2			(0.7071067811865475)
-#define ONE_BY_SQRT3			(0.57735026919)
-#define TWO_BY_SQRT3			(2.0f * 0.57735026919)
+#define ONE_BY_SQRT3			(0.57735026919f)
+#define TWO_BY_SQRT3			(2.0f * 0.57735026919f)
+#define SQRT3_BY_TWO			(0.866025403784439f)
 
 /* Null=V0 defines */
 #define MAX_AMPLITUDE			(0.866025403784439f)	// max alpha and beta magnitude
@@ -29,6 +30,8 @@ void foc_svm2(float alpha, float beta, uint32_t PWMFullDutyCycle, uint32_t* tAou
 void foc_svm3(float alpha, float beta, uint32_t PWMFullDutyCycle, uint32_t* tAout, uint32_t* tBout, uint32_t* tCout, uint32_t *svm_sector);
 void foc_svm4(float alpha, float beta, uint32_t PWMFullDutyCycle, uint32_t* tAout, uint32_t* tBout, uint32_t* tCout, uint32_t *svm_sector);
 void foc_svm5(float alpha, float beta, uint32_t PWMFullDutyCycle, uint32_t* tAout, uint32_t* tBout, uint32_t* tCout, uint32_t *svm_sector);
+void foc_svm6(float alpha, float beta, uint32_t PWMFullDutyCycle, uint32_t* tAout, uint32_t* tBout, uint32_t* tCout, uint32_t *svm_sector);
+
 
 
 #endif
