@@ -21,7 +21,8 @@ HEADERS = [
 
 if __name__=='__main__':
     test_files = os.listdir(FILE_PATH)
-    fig, axes = plt.subplots(len(test_files))
+    test_names = []
+    fig, axes = plt.subplots(1)
 
     for i, f in enumerate(test_files):
         test_name = os.path.splitext(f)[0]
@@ -37,19 +38,24 @@ if __name__=='__main__':
 
         print('{:>16s} :: {:5.1f} RPM/watt ({:4.1f} °C)'.format(test_name, ave_power, final_temp))
 
-        axes[i].plot(df['Time'], df['MOSFET Temp 1'], df['Time'], df['MOSFET Temp 2'], df['Time'], df['MOSFET Temp 3'])
-        axes[i].set_title(test_name)
-        axes[i].set_xlabel('Time, s')
-        axes[i].set_ylabel('FET Temperature, C')
-        axes[i].grid()
-        axes[i].set_ylim(bottom=18, top=24.5)
+        test_names += [test_name]
+        plot_time = df[df['Time'] > 1]
+        axes.plot(plot_time['RPM'].to_list(), plot_time['Power'].to_list())
+
+
+    axes.set_title('RPM/watt for each commutation technique')
+    axes.set_xlabel('RPM')
+    axes.set_ylabel('Watts')
+    axes.legend(test_names)
+    axes.grid()
+    axes.set_ylim(bottom=0, top=70)
 
 
 
     plt.subplots_adjust(left=0.1,
-                    bottom=0.05,
+                    bottom=0.1,
                     right=0.9,
-                    top=0.95,
+                    top=0.9,
                     wspace=0.5,
                     hspace=0.5)
     plt.show()
