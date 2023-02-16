@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 
-FILE_PATH = './tests'
+FILE_PATH = './long_tests'
 
 HEADERS = [
     'Time',
@@ -29,17 +29,17 @@ if __name__=='__main__':
         df = pd.read_csv(os.path.join(FILE_PATH, f), names=HEADERS, delimiter=';', index_col=False)
 
         # get average watts/rpm in the last 2 sec of each test
-        power_time = df[df['Time'] > 18]
+        power_time = df[df['Time'] > 121]
         ave_power = (power_time['RPM']/power_time['Power']).mean()
 
         # get final average temperature
-        temp_time = df[df['Time'] > 19.5]
+        temp_time = df[df['Time'] > 121]
         final_temp = temp_time['MOSFET Temp 1'].mean()
 
         print('{:>16s} :: {:5.1f} RPM/watt ({:4.1f} °C)'.format(test_name, ave_power, final_temp))
 
         test_names += [test_name]
-        plot_time = df[df['Time'] > 1]
+        plot_time = df[df['Time'] > 10]
         axes.plot(plot_time['RPM'].to_list(), plot_time['Power'].to_list())
 
 
@@ -48,7 +48,8 @@ if __name__=='__main__':
     axes.set_ylabel('Watts')
     axes.legend(test_names)
     axes.grid()
-    axes.set_ylim(bottom=0, top=70)
+    axes.set_ylim(bottom=0, top=100)
+    axes.set_yticks(range(0, 110, 10))
 
 
 

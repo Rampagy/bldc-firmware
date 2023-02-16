@@ -35,6 +35,7 @@ void foc_svm(float alpha, float beta, uint32_t PWMFullDutyCycle,
 	c = -1.0f*(a+b); // kirchhoff current law (current in = current out)
 
 	N = (((int32_t)a)>=0) + 2u*(((int32_t)b) >= 0) + 4u*(((int32_t)c) >= 0);
+	N = (N > 6) ? 3 : N; // if a, b, c are all zero set it to sector 1 (alpha & beta are zero)
 	sector = sector_LUT[N-1];
 
 	switch(sector) {
@@ -230,19 +231,21 @@ int main (int argc, char* args[]) {
 	(void)argc;
 	(void)args;
 
+	float throttle_cmd = 0.0f;
+
 	FILE* ars_stream = fopen("svm_ars.csv", "w");
 	FILE* null_v0_stream = fopen("svm_null_v0.csv", "w");
 	FILE* null_v7_stream = fopen("svm_null_v7.csv", "w");
 	FILE* v7_odd_v0_even_stream = fopen("svm_v7_odd_v0_even.csv", "w");
 	FILE* v0_odd_v7_even_stream = fopen("svm_v0_odd_v7_even.csv", "w");
 
-	for (float i = 0.0f; i < 360.0f; i += 0.05f) {
+	for (float i = 0.0f; i < 1800.0f; i += 0.05f) {
 		uint32_t tAout, tBout, tCout, sector = 0u;
 		float alpha, beta = 0.0f;
 
 		// determine the alpha-beta vectors from angle-magnitude
-		beta = SQRT3_BY_2*sinf( i*PI_OVER_180 );
-		alpha = SQRT3_BY_2*cosf( i*PI_OVER_180 );
+		beta = throttle_cmd*sinf( i*PI_OVER_180 );
+		alpha = throttle_cmd*cosf( i*PI_OVER_180 );
 
 		// magnitude is always 1000 (for this test)
 		foc_svm(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector, ars_svm_e);
@@ -259,6 +262,13 @@ int main (int argc, char* args[]) {
 
 		foc_svm(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector, v0_odd_v7_even_e);
 		fprintf(v0_odd_v7_even_stream, "%d,%d,%d,%d\n", (int)tAout, (int)tBout, (int)tCout, (int)sector); // write to file
+
+		if (throttle_cmd < SQRT3_BY_2) {
+			throttle_cmd += 0.00005f;
+		}
+		else {
+			throttle_cmd = SQRT3_BY_2;
+		}
 	}
 
 	(void)fclose( ars_stream );
