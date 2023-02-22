@@ -240,8 +240,8 @@ int main (int argc, char* args[]) {
 	FILE* v0_odd_v7_even_stream = fopen("svm_v0_odd_v7_even.csv", "w");
 
 	for (float i = 0.0f; i < 1800.0f; i += 0.05f) {
-		uint32_t tAout, tBout, tCout, sector = 0u;
-		float alpha, beta = 0.0f;
+		uint32_t tAout = 0u, tBout = 0u, tCout = 0u, sector = 0u;
+		float alpha = 0.0f, beta = 0.0f;
 
 		// determine the alpha-beta vectors from angle-magnitude
 		beta = throttle_cmd*sinf( i*PI_OVER_180 );
@@ -276,4 +276,29 @@ int main (int argc, char* args[]) {
 	(void)fclose( null_v7_stream );
 	(void)fclose( v7_odd_v0_even_stream );
 	(void)fclose( v0_odd_v7_even_stream );
+
+	// recreate the PWM signals (for visualization)
+	ars_stream = fopen("svm_ars_pwm.csv", "w");
+	null_v0_stream = fopen("svm_null_v0_pwm.csv", "w");
+	null_v7_stream = fopen("svm_null_v7_pwm.csv", "w");
+	v7_odd_v0_even_stream = fopen("svm_v7_odd_v0_even_pwm.csv", "w");
+	v0_odd_v7_even_stream = fopen("svm_v0_odd_v7_even_pwm.csv", "w");
+
+	float alpha = SQRT3_BY_2, beta = 0.5f;
+	uint32_t tAout = 0u, tBout = 0u, tCout = 0u, sector = 0u;
+
+	foc_svm(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector, ars_svm_e);
+	fprintf(ars_stream, "%d,%d,%d,%d\n", (int)tAout, (int)tBout, (int)tCout, (int)sector); // write to file
+
+	foc_svm(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector, null_v0_e);
+	fprintf(null_v0_stream, "%d,%d,%d,%d\n", (int)tAout, (int)tBout, (int)tCout, (int)sector); // write to file
+
+	foc_svm(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector, null_v7_e);
+	fprintf(null_v7_stream, "%d,%d,%d,%d\n", (int)tAout, (int)tBout, (int)tCout, (int)sector); // write to file
+
+	foc_svm(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector, v7_odd_v0_even_e);
+	fprintf(v7_odd_v0_even_stream, "%d,%d,%d,%d\n", (int)tAout, (int)tBout, (int)tCout, (int)sector); // write to file
+
+	foc_svm(alpha, beta, (uint32_t)1000u, &tAout, &tBout, &tCout, &sector, v0_odd_v7_even_e);
+	fprintf(v0_odd_v7_even_stream, "%d,%d,%d,%d\n", (int)tAout, (int)tBout, (int)tCout, (int)sector); // write to file1000u
 }
