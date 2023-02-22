@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 
-FILE_PATH = './long_tests'
+FILE_PATH = './encoder_v0v7_speed_ramp'
 
 HEADERS = [
     'Time',
@@ -39,17 +39,17 @@ if __name__=='__main__':
         print('{:>16s} :: {:5.1f} RPM/watt ({:4.1f} °C)'.format(test_name, ave_power, final_temp))
 
         test_names += [test_name]
-        plot_time = df[df['Time'] > 10]
+        plot_time = df[df['Time'] > 20]
         axes.plot(plot_time['RPM'].to_list(), plot_time['Power'].to_list())
 
 
-    axes.set_title('RPM/watt for each commutation technique')
+    axes.set_title('RPM/watt for each commutation technique (with hall effect and sampling in v7 and v0)')
     axes.set_xlabel('RPM')
     axes.set_ylabel('Watts')
     axes.legend(test_names)
     axes.grid()
     axes.set_ylim(bottom=0, top=100)
-    axes.set_yticks(range(0, 110, 10))
+    axes.set_yticks(range(0, 150, 10))
 
 
 
