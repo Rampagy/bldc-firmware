@@ -74,7 +74,7 @@ void TIM_Config(void)
     TIM_TimeBaseStructure.TIM_Prescaler = 2000;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_CenterAligned1;
     /* Compute the value to be set in ARR register to generate signal frequency at PWM_FREQ_HZ */
-    TIM_TimeBaseStructure.TIM_Period = TIMER_PERIOD+1;
+    TIM_TimeBaseStructure.TIM_Period = TIMER_PERIOD;
     TIM_TimeBaseStructure.TIM_ClockDivision = 0;
     TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;
 
