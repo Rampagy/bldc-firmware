@@ -46,6 +46,7 @@
 #include "stm32f4xx_rcc.h"
 #include "debug.h"
 #include "foc.h"
+#include "pwm_output.h"
 
 extern xDebugStats_t xDebugStats;
 
@@ -66,7 +67,7 @@ int main(void)
     /* Initialize all four LEDs built into the starter kit */
     STM_EVAL_LEDInit( LED3 );
     STM_EVAL_LEDInit( LED4 );
-    STM_EVAL_LEDInit( LED5 );
+    TIM_Config(); // STM_EVAL_LEDInit( LED5 );
     STM_EVAL_LEDInit( LED6 );
 
     /* Initialize the debug/performance timer. */

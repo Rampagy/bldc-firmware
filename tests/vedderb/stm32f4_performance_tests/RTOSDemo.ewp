@@ -1271,6 +1271,12 @@
         <name>$PROJ_DIR$\main.c</name>
     </file>
     <file>
+        <name>$PROJ_DIR$\pwm_output.c</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\pwm_output.h</name>
+    </file>
+    <file>
         <name>$PROJ_DIR$\stm32f4xx_it.c</name>
     </file>
     <file>
