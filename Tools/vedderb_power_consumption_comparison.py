@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 
-FILE_PATH = './encoder_v0v7_speed_ramp'
+FILE_PATH = './48v_tests'
 
 HEADERS = [
     'Time',
@@ -17,6 +17,16 @@ HEADERS = [
     'MOSFET Temp 1',
     'MOSFET Temp 2',
     'MOSFET Temp 3'
+]
+
+MeterRPM = [5500, 5499, 5500, 5501, 5500]
+
+MeterPower = [
+    (113.5, 'C0'), # watts (ars)
+    (112.5, 'C1'), # watts (null v0)
+    (112.5, 'C2'), # watts (null v7)
+    (112.5, 'C3'), # watts (v0_odd_v7_even)
+    (110.0, 'C4'), # watts (v7_odd_v0_even)
 ]
 
 if __name__=='__main__':
@@ -43,7 +53,10 @@ if __name__=='__main__':
         axes.plot(plot_time['RPM'].to_list(), plot_time['Power'].to_list())
 
 
-    axes.set_title('RPM/watt for each commutation technique (with hall effect and sampling in v7 and v0)')
+    for i, [p, c] in enumerate(MeterPower):
+        axes.plot(MeterRPM[i], [p], 'p', color=c, markersize=10)
+
+    axes.set_title('RPM/watt for each commutation technique')
     axes.set_xlabel('RPM')
     axes.set_ylabel('Watts')
     axes.legend(test_names)
